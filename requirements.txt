@@ -1,0 +1,25 @@
+# TxnTutor Dependencies
+
+# Web Framework
+streamlit>=1.30.0
+
+# Database
+psycopg2-binary>=2.9.9
+
+# Environment
+python-dotenv>=1.0.0
+
+# LLM Integration
+requests>=2.31.0
+
+# Optional: Gemini
+# google-generativeai>=0.3.0
+
+# Optional: OpenAI
+# openai>=1.0.0
+
+# Data Processing
+pandas>=2.0.0
+
+# Visualization
+plotly>=5.18.0
