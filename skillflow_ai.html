@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillFlow AI — Daily Tasks to Freedom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0b14;
+      --panel: #121425;
+      --panel-2: #1a1d33;
+      --text: #e8eaf6;
+      --muted: #9ca3c7;
+      --primary: #7c3aed;
+      --primary-2: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 20px 40px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+    body { min-height: 100vh; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 15% 20%, rgba(124,58,237,.35), transparent 40%),
+                  radial-gradient(circle at 85% 20%, rgba(37,99,235,.35), transparent 40%),
+                  linear-gradient(135deg, #0b1022 0%, #0f1230 45%, #170f30 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    #particles {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: .8;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 52px 20px 40px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 0 14px rgba(124,58,237,.9);
+      animation: pulse 2.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: .6; }
+    }
+
+    .tagline {
+      margin: 12px 0 0;
+      font-size: clamp(1rem, 1.7vw, 1.25rem);
+      color: #dbe1ff;
+      font-weight: 500;
+    }
+
+    .btn {
+      border: 0;
+      color: #fff;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: .2s transform, .2s opacity;
+      box-shadow: 0 8px 28px rgba(88,74,255,.35);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .65; cursor: not-allowed; }
+
+    .layout {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1.2fr 1.2fr .9fr;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.005));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h2, .panel h3 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      letter-spacing: .2px;
+    }
+
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 6px; font-size: .84rem; color: #bcc2e7; }
+    input, select {
+      width: 100%;
+      background: #0d1020;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      outline: none;
+    }
+
+    input:focus, select:focus { border-color: #646cff; }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+
+    .checks label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      background: #0d1020;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      font-size: .85rem;
+      color: #d8ddff;
+    }
+
+    .checks input { width: auto; }
+
+    .status-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: #0d1020;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: .78rem;
+      color: #d1d7ff;
+    }
+
+    .task-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task-card {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #12152b, #0f1225);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .task-main h4 { margin: 0 0 4px; font-size: .95rem; }
+    .task-main p { margin: 0 0 9px; color: #bec5ea; font-size: .84rem; line-height: 1.45; }
+
+    .meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: .74rem;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .easy { color: #82f3c4; background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.28); }
+    .medium { color: #f7d071; background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.28); }
+    .hard { color: #ff9898; background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); }
+    .category { color: #abc4ff; background: rgba(96,165,250,.12); border-color: rgba(96,165,250,.24); }
+
+    .ring {
+      width: 36px;
+      height: 36px;
+      position: relative;
+    }
+    .ring svg { transform: rotate(-90deg); }
+    .ring-text {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: .66rem;
+      color: #cdd3f5;
+    }
+
+    .income-form {
+      display: grid;
+      grid-template-columns: 1fr .7fr 1fr auto;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .income-list {
+      max-height: 170px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      background: #0d1020;
+      font-size: .84rem;
+    }
+
+    .income-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 4px;
+      border-bottom: 1px dashed rgba(255,255,255,.06);
+    }
+
+    .income-item:last-child { border-bottom: 0; }
+
+    .goal-wrap { margin: 12px 0 8px; }
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #0d1020;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #10b981, #22d3ee);
+      transition: width .35s ease;
+    }
+
+    .chart {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: #0d1020;
+      border-radius: 10px;
+      padding: 8px;
+    }
+    .chart canvas { width: 100%; height: 150px; display: block; }
+
+    .roadmap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .week {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #0d1020;
+      position: relative;
+    }
+
+    .week.active {
+      border-color: rgba(124,58,237,.7);
+      box-shadow: 0 0 0 1px rgba(124,58,237,.25), 0 10px 24px rgba(124,58,237,.2);
+    }
+
+    .week strong { display: block; font-size: .9rem; }
+    .week small { color: var(--muted); font-size: .75rem; }
+
+    .motivation {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(124,58,237,.12), rgba(37,99,235,.12));
+    }
+
+    .motivation p { margin: 0; font-size: .86rem; color: #e0e6ff; line-height: 1.5; min-height: 42px; }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 40;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      opacity: .95;
+      animation: fall 2400ms linear forwards;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-20px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .income-form { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .hero-inner { padding-top: 44px; }
+      .task-card { grid-template-columns: auto 1fr; }
+      .ring { grid-column: 2; justify-self: end; }
+      .income-form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <canvas id="particles"></canvas>
+    <div class="hero-inner">
+      <div>
+        <div class="logo"><span class="logo-dot"></span> SkillFlow AI</div>
+        <p class="tagline">Your AI Business Coach - Daily Tasks to Freedom</p>
+      </div>
+      <button id="generateTop" class="btn">Generate Today's Tasks</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Profile Setup</h2>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label>Current Skills</label>
+        <div class="checks" id="skillsWrap">
+          <label><input type="checkbox" value="Python">Python</label>
+          <label><input type="checkbox" value="SQL">SQL</label>
+          <label><input type="checkbox" value="n8n">n8n</label>
+          <label><input type="checkbox" value="ChatGPT">ChatGPT</label>
+          <label><input type="checkbox" value="Claude">Claude</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="goal">Goal</label>
+        <select id="goal">
+          <option>Freelancing</option>
+          <option>Digital Products</option>
+          <option>YouTube Automation</option>
+          <option>AI Agency</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="week">Current Week (1-4 of 30-day plan)</label>
+        <select id="week">
+          <option value="1">Week 1</option>
+          <option value="2">Week 2</option>
+          <option value="3">Week 3</option>
+          <option value="4">Week 4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="apiKey">OpenAI API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-..." />
+      </div>
+      <button id="generate" class="btn" style="width:100%">Generate Today's Tasks</button>
+    </section>
+
+    <section class="panel">
+      <div class="status-row">
+        <h2 style="margin:0">Today's Task Flow</h2>
+        <div class="chip">Streak: <strong id="streak">0</strong> days</div>
+        <div class="chip" id="progressLabel">Progress: 0%</div>
+      </div>
+      <div id="tasks" class="task-grid"></div>
+    </section>
+
+    <aside class="panel">
+      <h3>30-Day Roadmap</h3>
+      <div id="roadmap" class="roadmap"></div>
+
+      <div class="motivation">
+        <h3 style="margin-top:0">Motivation Boost</h3>
+        <p id="quote">Small offers shipped daily beat perfect ideas kept private.</p>
+      </div>
+
+      <h3 style="margin-top:16px">Income Tracker</h3>
+      <div class="income-form">
+        <input id="incDate" type="date" />
+        <input id="incAmount" type="number" min="0" step="0.01" placeholder="Amount" />
+        <input id="incSource" placeholder="Source" />
+        <button id="addIncome" class="btn" style="padding:10px 12px">Add</button>
+      </div>
+
+      <div class="goal-wrap">
+        <div style="display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:6px; color:#c8cdf0;">
+          <span>Monthly Goal</span>
+          <span id="goalText">$0 / $500</span>
+        </div>
+        <div class="bar"><span id="goalBar"></span></div>
+      </div>
+
+      <div id="incomeList" class="income-list"></div>
+
+      <div class="chart">
+        <canvas id="incomeChart" width="380" height="150"></canvas>
+      </div>
+    </aside>
+  </main>
+
+  <div id="confettiLayer" class="confetti"></div>
+
+  <script>
+    const STORAGE_KEY = 'skillflow_ai_state_v1';
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      profile: { name: '', skills: [], goal: 'Freelancing', week: 1, apiKey: '' },
+      tasks: [],
+      completedToday: false,
+      streak: 0,
+      lastCompletedDate: null,
+      income: [],
+      quoteIndex: 0,
+      ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    };
+
+    const quotes = [
+      'Clients buy outcomes, not hours. Build micro-proof every day.',
+      'Automate one painful workflow and you have your first offer.',
+      'Your portfolio is just public reps stacked over time.',
+      'You are one strong case study away from consistent inbound leads.',
+      'Ship useful, simple AI systems. Complexity does not get paid.',
+      'Every outreach message is a seed. Volume + value = pipeline.'
+    ];
+
+    const weekMilestones = {
+      1: 'Foundation: skill inventory + niche research + first mini automation.',
+      2: 'Offer Crafting: package services, create portfolio snippets, begin outreach.',
+      3: 'Acquisition: post daily proof, prospect clients, run discovery calls.',
+      4: 'Scale: optimize delivery, collect testimonials, systemize lead generation.'
+    };
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadProfile() {
+      $('name').value = state.profile.name || '';
+      $('goal').value = state.profile.goal || 'Freelancing';
+      $('week').value = String(state.profile.week || 1);
+      $('apiKey').value = state.profile.apiKey || '';
+      [...document.querySelectorAll('#skillsWrap input[type="checkbox"]')].forEach(cb => {
+        cb.checked = state.profile.skills?.includes(cb.value);
+      });
+    }
+
+    function persistProfile() {
+      state.profile.name = $('name').value.trim();
+      state.profile.goal = $('goal').value;
+      state.profile.week = Number($('week').value);
+      state.profile.apiKey = $('apiKey').value.trim();
+      state.profile.skills = [...document.querySelectorAll('#skillsWrap input[type="checkbox"]:checked')].map(i => i.value);
+      saveState();
+      renderRoadmap();
+    }
+
+    function difficultyClass(level) {
+      const key = String(level || '').toLowerCase();
+      if (key.includes('hard')) return 'hard';
+      if (key.includes('medium')) return 'medium';
+      return 'easy';
+    }
+
+    function normalizeTasks(tasks) {
+      return (tasks || []).slice(0, 6).map((t, idx) => ({
+        id: t.id || `task-${idx + 1}`,
+        title: t.title || `Task ${idx + 1}`,
+        description: t.description || 'No description provided.',
+        estimatedTime: t.estimatedTime || '30 min',
+        difficulty: t.difficulty || 'Easy',
+        category: t.category || 'Build',
+        done: Boolean(t.done)
+      }));
+    }
+
+    function renderTasks() {
+      const wrap = $('tasks');
+      if (!state.tasks.length) {
+        wrap.innerHTML = '<div class="chip" style="padding:10px 12px;">No tasks yet. Generate your daily plan.</div>';
+        updateProgress();
+        return;
+      }
+
+      wrap.innerHTML = state.tasks.map((task, idx) => {
+        const pct = task.done ? 100 : 0;
+        const r = 14;
+        const c = 2 * Math.PI * r;
+        const off = c - (pct / 100) * c;
+        return `
+          <article class="task-card">
+            <input type="checkbox" data-idx="${idx}" ${task.done ? 'checked' : ''} aria-label="Mark ${task.title} done" />
+            <div class="task-main">
+              <h4>${task.title}</h4>
+              <p>${task.description}</p>
+              <div class="meta">
+                <span class="badge ${difficultyClass(task.difficulty)}">${task.difficulty}</span>
+                <span class="badge category">${task.category}</span>
+                <span class="badge" style="border-color:var(--border)">${task.estimatedTime}</span>
+              </div>
+            </div>
+            <div class="ring" title="Completion">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" stroke="rgba(255,255,255,.12)" stroke-width="4" fill="none"></circle>
+                <circle cx="18" cy="18" r="14" stroke="url(#grad${idx})" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"></circle>
+                <defs>
+                  <linearGradient id="grad${idx}" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#7c3aed"></stop>
+                    <stop offset="100%" stop-color="#22d3ee"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="ring-text">${pct}%</div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      wrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const idx = Number(e.target.dataset.idx);
+          state.tasks[idx].done = e.target.checked;
+          updateProgress(true);
+          saveState();
+          renderTasks();
+        });
+      });
+
+      updateProgress();
+    }
+
+    function todayStr() {
+      const d = new Date();
+      return d.toISOString().slice(0, 10);
+    }
+
+    function updateProgress(checkConfetti = false) {
+      const total = state.tasks.length || 1;
+      const done = state.tasks.filter(t => t.done).length;
+      const pct = Math.round((done / total) * 100);
+      $('progressLabel').textContent = `Progress: ${pct}%`;
+
+      if (state.tasks.length === 6 && done === 6) {
+        const today = todayStr();
+        if (state.lastCompletedDate !== today) {
+          if (state.lastCompletedDate) {
+            const prev = new Date(state.lastCompletedDate);
+            const cur = new Date(today);
+            const diff = Math.round((cur - prev) / 86400000);
+            state.streak = diff === 1 ? state.streak + 1 : 1;
+          } else {
+            state.streak = 1;
+          }
+          state.lastCompletedDate = today;
+          state.completedToday = true;
+          if (checkConfetti) fireConfetti();
+          saveState();
+        }
+      }
+
+      $('streak').textContent = String(state.streak || 0);
+    }
+
+    async function generateTasks() {
+      persistProfile();
+      const { name, skills, goal, week, apiKey } = state.profile;
+      if (!apiKey) {
+        alert('Please enter your OpenAI API key.');
+        return;
+      }
+
+      const btns = [$('generate'), $('generateTop')];
+      btns.forEach(b => { b.disabled = true; b.textContent = 'Generating...'; });
+
+      const systemPrompt = `You are SkillFlow AI, an elite AI business coach. Generate EXACTLY 6 practical daily tasks for a learner building income online with AI automation.
+Rules:
+- Return strict JSON only with shape: {"tasks":[{"title":"","description":"","estimatedTime":"","difficulty":"Easy|Medium|Hard","category":"Build|Learn|Earn|Market"}]}
+- Exactly 6 tasks.
+- Tasks must be concrete, executable today, and tailored to user's skills, goal, and week in a 30-day roadmap.
+- Balance categories and include at least one Earn or Market task.
+- Descriptions must include measurable output (e.g., number of outreach messages, mini project deliverable, portfolio artifact).
+- Keep each description under 35 words.`;
+
+      const userPrompt = `Profile:
+Name: ${name || 'Learner'}
+Skills: ${(skills || []).join(', ') || 'None yet'}
+Goal: ${goal}
+Current week: ${week} (1-4)
+Create today's tasks now.`;
+
+      try {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            temperature: 0.7,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt }
+            ],
+            response_format: { type: 'json_object' }
+          })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          alert(`OpenAI request failed: ${res.status} ${errText}`);
+          return;
+        }
+
+        const data = await res.json();
+        const content = data?.choices?.[0]?.message?.content || '{}';
+        const parsed = JSON.parse(content);
+        const tasks = normalizeTasks(parsed.tasks);
+        if (tasks.length !== 6) {
+          alert('Model response was not exactly 6 tasks. Please retry.');
+          return;
+        }
+
+        state.tasks = tasks;
+        state.completedToday = false;
+        saveState();
+        renderTasks();
+      } catch (err) {
+        alert(`Error generating tasks: ${err.message}`);
+      } finally {
+        btns.forEach(b => { b.disabled = false; b.textContent = "Generate Today's Tasks"; });
+      }
+    }
+
+    function renderRoadmap() {
+      const currentWeek = Number(state.profile.week || 1);
+      $('roadmap').innerHTML = [1,2,3,4].map(week => `
+        <div class="week ${week === currentWeek ? 'active' : ''}">
+          <strong>Week ${week}</strong>
+          <small>Days ${(week - 1) * 7 + 1}-${Math.min(week * 7, 30)} • ${weekMilestones[week]}</small>
+        </div>
+      `).join('');
+    }
+
+    function addIncome() {
+      const date = $('incDate').value || todayStr();
+      const amount = Number($('incAmount').value);
+      const source = $('incSource').value.trim();
+      if (!amount || amount <= 0 || !source) {
+        alert('Enter valid income amount and source.');
+        return;
+      }
+      state.income.push({ date, amount, source });
+      state.income.sort((a,b) => a.date.localeCompare(b.date));
+      $('incAmount').value = '';
+      $('incSource').value = '';
+      saveState();
+      renderIncome();
+    }
+
+    function renderIncome() {
+      const list = $('incomeList');
+      if (!state.income.length) {
+        list.innerHTML = '<div style="color:#97a0cc; padding:4px">No income logged yet.</div>';
+      } else {
+        list.innerHTML = state.income.map(i => `
+          <div class="income-item">
+            <span>${i.date} • ${i.source}</span>
+            <strong>$${i.amount.toFixed(2)}</strong>
+          </div>
+        `).join('');
+      }
+
+      const total = state.income.reduce((sum, i) => sum + i.amount, 0);
+      const pct = Math.min(100, (total / 500) * 100);
+      $('goalText').textContent = `$${total.toFixed(2)} / $500`;
+      $('goalBar').style.width = `${pct}%`;
+      drawIncomeChart();
+    }
+
+    function drawIncomeChart() {
+      const canvas = $('incomeChart');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 4; i++) {
+        const y = (h / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(34, y);
+        ctx.lineTo(w - 10, y);
+        ctx.stroke();
+      }
+
+      const byDate = {};
+      state.income.forEach(entry => {
+        byDate[entry.date] = (byDate[entry.date] || 0) + entry.amount;
+      });
+      const dates = Object.keys(byDate).sort();
+      if (!dates.length) return;
+
+      const vals = dates.map(d => byDate[d]);
+      const max = Math.max(...vals, 50);
+      const chartW = w - 50;
+      const chartH = h - 30;
+
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+
+      vals.forEach((v, i) => {
+        const x = 34 + (dates.length === 1 ? chartW / 2 : (i / (dates.length - 1)) * chartW);
+        const y = 8 + (1 - v / max) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      vals.forEach((v, i) => {
+        const x = 34 + (dates.length === 1 ? chartW / 2 : (i / (dates.length - 1)) * chartW);
+        const y = 8 + (1 - v / max) * chartH;
+        ctx.fillStyle = '#7c3aed';
+        ctx.beginPath();
+        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = '#aeb6de';
+      ctx.font = '11px Inter';
+      ctx.fillText(`$${max.toFixed(0)}`, 4, 12);
+      ctx.fillText('$0', 10, h - 8);
+    }
+
+    function rotateQuotes() {
+      state.quoteIndex = (state.quoteIndex + 1) % quotes.length;
+      $('quote').textContent = quotes[state.quoteIndex];
+      saveState();
+    }
+
+    function fireConfetti() {
+      const layer = $('confettiLayer');
+      const colors = ['#7c3aed', '#22d3ee', '#10b981', '#f59e0b', '#ef4444'];
+      for (let i = 0; i < 130; i++) {
+        const p = document.createElement('span');
+        p.className = 'confetti-piece';
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.animationDuration = `${1800 + Math.random() * 1400}ms`;
+        p.style.transform = `translateY(-20px) rotate(${Math.random() * 180}deg)`;
+        layer.appendChild(p);
+        setTimeout(() => p.remove(), 3200);
+      }
+    }
+
+    function initParticles() {
+      const canvas = $('particles');
+      const ctx = canvas.getContext('2d');
+      let parts = [];
+
+      function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        parts = Array.from({ length: Math.max(26, Math.floor(canvas.width / 46)) }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 1 + Math.random() * 2.8,
+          vx: -0.25 + Math.random() * 0.5,
+          vy: -0.2 + Math.random() * 0.4,
+          a: 0.25 + Math.random() * 0.55
+        }));
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        parts.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < -10) p.x = canvas.width + 8;
+          if (p.x > canvas.width + 10) p.x = -8;
+          if (p.y < -10) p.y = canvas.height + 8;
+          if (p.y > canvas.height + 10) p.y = -8;
+          ctx.fillStyle = `rgba(173, 196, 255, ${p.a})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        for (let i = 0; i < parts.length; i++) {
+          for (let j = i + 1; j < parts.length; j++) {
+            const dx = parts[i].x - parts[j].x;
+            const dy = parts[i].y - parts[j].y;
+            const d = Math.hypot(dx, dy);
+            if (d < 90) {
+              ctx.strokeStyle = `rgba(124, 58, 237, ${0.13 - d / 900})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(parts[i].x, parts[i].y);
+              ctx.lineTo(parts[j].x, parts[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      draw();
+    }
+
+    function bindEvents() {
+      $('generate').addEventListener('click', generateTasks);
+      $('generateTop').addEventListener('click', generateTasks);
+      $('addIncome').addEventListener('click', addIncome);
+      $('incDate').value = todayStr();
+
+      ['name','goal','week','apiKey'].forEach(id => {
+        $(id).addEventListener('input', persistProfile);
+        $(id).addEventListener('change', persistProfile);
+      });
+      document.querySelectorAll('#skillsWrap input').forEach(el => {
+        el.addEventListener('change', persistProfile);
+      });
+    }
+
+    function init() {
+      loadProfile();
+      renderRoadmap();
+      renderTasks();
+      $('quote').textContent = quotes[state.quoteIndex % quotes.length];
+      renderIncome();
+      bindEvents();
+      initParticles();
+      setInterval(rotateQuotes, 7000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
