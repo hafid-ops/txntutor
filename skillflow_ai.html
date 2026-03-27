@@ -641,14 +641,14 @@ Create today's tasks now.`;
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            candidates[0].content.parts[0].text
           },
           body: JSON.stringify({
             contents: [{ parts: [{ text: systemPrompt }] }],
             temperature: 0.7,
-            messages: [
+            contents: [
               { role: 'system', content: systemPrompt },
-              { role: 'user', content: userPrompt }
+              { parts: [{text: userPrompt }
             ],
             response_format: { type: 'json_object' }
           })
@@ -656,7 +656,7 @@ Create today's tasks now.`;
 
         if (!res.ok) {
           const errText = await res.text();
-          alert(`OpenAI request failed: ${res.status} ${errText}`);
+          alert(`Gemini request failed: ${res.status} ${errText}`);
           return;
         }
 
