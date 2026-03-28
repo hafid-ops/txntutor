@@ -40,7 +40,7 @@ async function generateTasks() {
   status.textContent = 'Calling Gemini AI...';
   errDiv.textContent = '';
   cards.innerHTML = '';
-  var KEY = 'AIzaSyD-1rGs4q6SOoY2Lr0f-kaF1kLCXKcmfkk';
+    var KEY = 'AIzaSyAyEE-ep1lsi0Xf05tRiXqSOCeKCen2y18';
   var prompt = 'Generate 6 practical daily tasks for someone learning AI automation and making money online. Return ONLY a JSON array. Each item must have title, description, category, difficulty, timeEstimate as string fields. No markdown, no code blocks, just raw JSON array.';
   fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + KEY, {
     method: 'POST',
