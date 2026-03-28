@@ -1,73 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillFlow AI</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0f0a1e; color: #f0f0f8; font-family: sans-serif; min-height: 100vh; padding: 20px; }
-h1 { text-align: center; font-size: 2rem; margin-bottom: 10px; background: linear-gradient(135deg, #7c3aed, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-p.sub { text-align: center; color: #9898b0; margin-bottom: 30px; }
-.btn { display: block; margin: 0 auto 20px; padding: 14px 40px; background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-#status { text-align: center; color: #9898b0; margin-bottom: 20px; min-height: 24px; }
-#error { text-align: center; color: #f87171; margin-bottom: 20px; min-height: 24px; }
-#cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1000px; margin: 0 auto; }
-.card { background: #1a1030; border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 18px; }
-.tags { display: flex; gap: 8px; margin-bottom: 10px; }
-.tag { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; background: rgba(124,58,237,0.2); color: #a78bfa; }
-.card h3 { font-size: 1rem; margin-bottom: 8px; color: #f0f0f8; }
-.card p { font-size: 0.88rem; color: #9898b0; margin-bottom: 10px; }
-.time { font-size: 0.8rem; color: #6b6b80; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillFlow 30-Day AI Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f0a1e;
+      --panel: #18112f;
+      --panel-soft: #22193f;
+      --text: #ececf9;
+      --muted: #9ca3c9;
+      --accent-a: #7c3aed;
+      --accent-b: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --border: rgba(124, 58, 237, 0.28);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #1d1340 0%, var(--bg) 45%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 22px;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .meta,
+    .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .chip {
+      background: rgba(124, 58, 237, 0.14);
+      border: 1px solid rgba(124, 58, 237, 0.35);
+      border-radius: 999px;
+      padding: 9px 13px;
+      color: #c9b8ff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .profile-grid,
+    .progress-row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    select,
+    input,
+    .btn {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      background: #130d28;
+      color: var(--text);
+      padding: 11px 12px;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .status {
+      font-size: 0.92rem;
+      color: #c9b8ff;
+      min-height: 1.2rem;
+    }
+
+    .error {
+      font-size: 0.92rem;
+      color: var(--danger);
+      min-height: 1.2rem;
+      margin-top: 6px;
+    }
+
+    .bar-wrap {
+      width: 100%;
+      background: #110b24;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      height: 14px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #22c55e, #3b82f6);
+      transition: width 0.2s ease;
+    }
+
+    #cards {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .task {
+      background: var(--panel-soft);
+      border: 1px solid rgba(124, 58, 237, 0.24);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .task h3 {
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .task p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: #cfbefd;
+      background: rgba(124, 58, 237, 0.12);
+    }
+
+    .task a {
+      color: #93c5fd;
+      font-size: 0.87rem;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .task a:hover {
+      text-decoration: underline;
+    }
+
+    .done h3,
+    .done p,
+    .done .meta-line,
+    .done a {
+      text-decoration: line-through;
+      opacity: 0.8;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #adf2c5;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .income-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .week {
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .week strong {
+      color: #ede9fe;
+    }
+
+    .week.active {
+      border-color: rgba(59, 130, 246, 0.55);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(124, 58, 237, 0.18));
+      color: #dbeafe;
+    }
+
+    @media (max-width: 740px) {
+      body {
+        padding: 14px;
+      }
+
+      .header-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chip {
+        width: fit-content;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>⚡ SkillFlow AI</h1>
-<p class="sub">Daily AI-generated tasks to build skills and earn online</p>
-<button class="btn" onclick="generateTasks()">⚡ Generate Tasks</button>
-<div id="status"></div>
-<div id="error"></div>
-<div id="cards"></div>
-<script>
-async function generateTasks() {
-  var btn = document.querySelector('.btn');
-  var status = document.getElementById('status');
-  var errDiv = document.getElementById('error');
-  var cards = document.getElementById('cards');
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-  status.textContent = 'Calling Gemini AI...';
-  errDiv.textContent = '';
-  cards.innerHTML = '';
-    var KEY = 'AIzaSyAyEE-ep1lsi0Xf05tRiXqSOCeKCen2y18';
-  var prompt = 'Generate 6 practical daily tasks for someone learning AI automation and making money online. Return ONLY a JSON array. Each item must have title, description, category, difficulty, timeEstimate as string fields. No markdown, no code blocks, just raw JSON array.';
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + KEY, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.error) throw new Error(data.error.message);
-    var text = data.candidates[0].content.parts[0].text;
-    var match = text.match(/\[([\s\S]*)\]/);
-    if (!match) throw new Error('Bad response: ' + text.slice(0, 150));
-    var tasks = JSON.parse('[' + match[1] + ']');
-    cards.innerHTML = tasks.slice(0, 6).map(function(t) {
-      return '<div class="card"><div class="tags"><span class="tag">' + (t.category||'AI') + '</span><span class="tag">' + (t.difficulty||'Medium') + '</span></div><h3>' + t.title + '</h3><p>' + t.description + '</p><div class="time">⏱ ' + t.timeEstimate + '</div></div>';
-    }).join('');
-    status.textContent = '✅ ' + tasks.length + ' tasks ready!';
-  })
-  .catch(function(err) {
-    errDiv.textContent = '❌ Error: ' + err.message;
-    status.textContent = '';
-  })
-  .finally(function() {
-    btn.disabled = false;
-    btn.textContent = '⚡ Generate Tasks';
-  });
-}
-</script>
+  <main class="container">
+    <section class="panel header-grid">
+      <div>
+        <h1>SkillFlow Daily AI Dashboard</h1>
+        <p id="todayDate" class="meta"></p>
+        <p id="greeting" class="sub"></p>
+      </div>
+      <div id="dayCounter" class="chip">Day 1 of 30</div>
+    </section>
+
+    <section class="panel">
+      <h2 class="sub" style="font-weight:700; color:#e2dcff; margin-bottom:10px;">Skill Profile</h2>
+      <div class="profile-grid">
+        <div>
+          <label for="focus">Current Focus</label>
+          <select id="focus">
+            <option>Python</option>
+            <option>SQL</option>
+            <option>n8n</option>
+            <option>ChatGPT API</option>
+            <option>All</option>
+          </select>
+        </div>
+        <div>
+          <label for="level">Experience Level</label>
+          <select id="level">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+          </select>
+        </div>
+        <div>
+          <label for="apiKey">Gemini API Key</label>
+          <input id="apiKey" type="password" placeholder="Paste your Gemini API key" />
+          <p id="apiHelp" class="sub" style="margin-top:6px;"></p>
+        </div>
+        <div>
+          <label for="generateBtn">Generate Today’s Plan</label>
+          <button id="generateBtn" class="btn">Generate 6 Action Tasks</button>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:8px;">Your selections are saved automatically.</p>
+      <p id="status" class="status"></p>
+      <p id="error" class="error"></p>
+    </section>
+
+    <section class="panel progress-row">
+      <div>
+        <h2 class="sub" style="font-weight:700; color:#e2dcff; margin-bottom:8px;">Today Progress</h2>
+        <p id="progressText" class="meta">0/6 tasks completed today</p>
+      </div>
+      <div class="bar-wrap">
+        <div id="progressBar" class="bar"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="sub" style="font-weight:700; color:#e2dcff;">Today’s Tasks</h2>
+      <div id="cards" style="margin-top:12px;"></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="sub" style="font-weight:700; color:#e2dcff;">30-Day Income Roadmap</h2>
+      <div id="incomeRoadmap" class="income-list"></div>
+    </section>
+  </main>
+
+  <script>
+    const START_DATE_STR = '2026-03-28';
+    const START_DATE = new Date(START_DATE_STR + 'T00:00:00');
+    const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
+    const profileKey = 'skillflow_profile';
+    const apiKeyStorageKey = 'skillflow_api_key';
+
+    const focusEl = document.getElementById('focus');
+    const levelEl = document.getElementById('level');
+    const apiKeyEl = document.getElementById('apiKey');
+    const apiHelpEl = document.getElementById('apiHelp');
+    const generateBtn = document.getElementById('generateBtn');
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const cardsEl = document.getElementById('cards');
+
+    function getTodayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function getDayNumber() {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diff = Math.floor((today - START_DATE) / 86400000) + 1;
+      return Math.max(1, Math.min(30, diff));
+    }
+
+    function saveProfile() {
+      localStorage.setItem(profileKey, JSON.stringify({
+        focus: focusEl.value,
+        level: levelEl.value
+      }));
+    }
+
+    function loadProfile() {
+      try {
+        const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        if (profile.focus) focusEl.value = profile.focus;
+        if (profile.level) levelEl.value = profile.level;
+      } catch (e) {
+        console.warn('Could not load profile', e);
+      }
+    }
+
+    function saveApiKey() {
+      localStorage.setItem(apiKeyStorageKey, apiKeyEl.value.trim());
+      updateApiHelpText();
+    }
+
+    function loadApiKey() {
+      const savedKey = localStorage.getItem(apiKeyStorageKey) || '';
+      apiKeyEl.value = savedKey;
+      updateApiHelpText();
+    }
+
+    function updateApiHelpText() {
+      if (!apiKeyEl.value.trim()) {
+        apiHelpEl.textContent = 'Get your free key at aistudio.google.com/app/apikey';
+        return;
+      }
+      apiHelpEl.textContent = '';
+    }
+
+    function getTasksStorageKey(dateKey) {
+      return 'skillflow_tasks_' + dateKey;
+    }
+
+    function storeTasksForToday(tasks) {
+      localStorage.setItem(getTasksStorageKey(getTodayKey()), JSON.stringify(tasks));
+    }
+
+    function loadTasksForToday() {
+      try {
+        const raw = localStorage.getItem(getTasksStorageKey(getTodayKey()));
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.warn('Could not load tasks', e);
+        return [];
+      }
+    }
+
+    function sanitizeText(value) {
+      return String(value || '').replace(/[&<>'"]/g, function(c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c];
+      });
+    }
+
+    function updateProgress(tasks) {
+      const completed = tasks.filter(function(t) { return t.completed; }).length;
+      const total = tasks.length || 6;
+      const percent = Math.round((completed / total) * 100);
+      document.getElementById('progressText').textContent = completed + '/' + total + ' tasks completed today';
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function renderTasks(tasks) {
+      if (!tasks.length) {
+        cardsEl.innerHTML = '<p class="sub">No tasks generated for today yet. Use the button above.</p>';
+        updateProgress([]);
+        return;
+      }
+
+      cardsEl.innerHTML = tasks.map(function(task, index) {
+        const doneClass = task.completed ? 'task done' : 'task';
+        const checkBadge = task.completed ? '<span class="check">✅ Completed</span>' : '<span class="check hidden">✅ Completed</span>';
+        const link = sanitizeText(task.actionLink || 'https://www.youtube.com');
+
+        return (
+          '<article class="' + doneClass + '" data-index="' + index + '">' +
+            '<div class="task-head">' +
+              '<input type="checkbox" class="task-check" ' + (task.completed ? 'checked' : '') + ' aria-label="Mark task complete" />' +
+              '<div>' +
+                '<h3>' + sanitizeText(task.title) + '</h3>' +
+                '<div class="tags">' +
+                  '<span class="tag">' + sanitizeText(task.category || 'General') + '</span>' +
+                  '<span class="tag">' + sanitizeText(task.difficulty || 'Medium') + '</span>' +
+                  '<span class="tag">⏱ ' + sanitizeText(task.timeEstimate || '30-60 min') + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<p>' + sanitizeText(task.description) + '</p>' +
+            '<p class="meta-line"><a href="' + link + '" target="_blank" rel="noopener">Resource: ' + link + '</a></p>' +
+            checkBadge +
+          '</article>'
+        );
+      }).join('');
+
+      updateProgress(tasks);
+    }
+
+    function attachTaskEvents() {
+      cardsEl.querySelectorAll('.task-check').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function(event) {
+          const card = event.target.closest('.task');
+          const idx = Number(card.getAttribute('data-index'));
+          const tasks = loadTasksForToday();
+          if (!tasks[idx]) return;
+
+          tasks[idx].completed = event.target.checked;
+          storeTasksForToday(tasks);
+          renderTasks(tasks);
+          attachTaskEvents();
+        });
+      });
+    }
+
+    function parseTasksFromText(text) {
+      const clean = String(text || '').trim();
+      const fenced = clean.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+      const start = fenced.indexOf('[');
+      const end = fenced.lastIndexOf(']');
+      if (start === -1 || end === -1 || end <= start) {
+        throw new Error('Gemini did not return a JSON array.');
+      }
+      const parsed = JSON.parse(fenced.slice(start, end + 1));
+      if (!Array.isArray(parsed)) {
+        throw new Error('Parsed response is not an array.');
+      }
+      return parsed.slice(0, 6).map(function(item) {
+        return {
+          title: item.title || 'Untitled Task',
+          description: item.description || 'No description provided.',
+          category: item.category || 'General',
+          difficulty: item.difficulty || 'Medium',
+          timeEstimate: item.timeEstimate || '30-60 min',
+          actionLink: item.actionLink || 'https://www.youtube.com',
+          completed: false
+        };
+      });
+    }
+
+    async function generateTasks() {
+      const dayNumber = getDayNumber();
+      const apiKey = (localStorage.getItem(apiKeyStorageKey) || apiKeyEl.value || '').trim();
+      const prompt = [
+        'Create exactly 6 specific actionable tasks in valid JSON array format only.',
+        'User skill focus: ' + focusEl.value + '.',
+        'Experience level: ' + levelEl.value + '.',
+        'Current challenge day: Day ' + dayNumber + ' of 30.',
+        'Each item must include: title, description, category, difficulty, timeEstimate, actionLink.',
+        'actionLink must be a real free URL (docs, YouTube, tutorials, official docs).',
+        'No markdown, no explanations, output only JSON array.'
+      ].join(' ');
+
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Generating...';
+      statusEl.textContent = 'Calling Gemini for your day plan...';
+      errorEl.textContent = '';
+
+      try {
+        if (!apiKey) {
+          throw new Error('Gemini API key required. Add it in Skill Profile.');
+        }
+
+        const response = await fetch(GEMINI_BASE_URL + encodeURIComponent(apiKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+
+        const data = await response.json();
+        if (!response.ok || data.error) {
+          throw new Error((data.error && data.error.message) || 'Gemini request failed.');
+        }
+
+        const text = data.candidates[0].content.parts[0].text;
+        const tasks = parseTasksFromText(text);
+
+        storeTasksForToday(tasks);
+        renderTasks(tasks);
+        attachTaskEvents();
+
+        statusEl.textContent = '✅ 6 tasks generated for today.';
+      } catch (error) {
+        errorEl.textContent = '❌ ' + error.message;
+        statusEl.textContent = '';
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate 6 Action Tasks';
+      }
+    }
+
+    function renderIncomeRoadmap(dayNumber) {
+      const weeks = [
+        { label: 'Week 1', text: 'Learn (foundation + repetition)', from: 1, to: 7 },
+        { label: 'Week 2', text: 'Build (portfolio projects)', from: 8, to: 14 },
+        { label: 'Week 3', text: 'First client outreach', from: 15, to: 21 },
+        { label: 'Week 4', text: 'First $', from: 22, to: 30 }
+      ];
+
+      const html = weeks.map(function(week) {
+        const active = dayNumber >= week.from && dayNumber <= week.to;
+        return '<div class="week ' + (active ? 'active' : '') + '"><strong>' + week.label + ':</strong> ' + week.text + '</div>';
+      }).join('');
+
+      document.getElementById('incomeRoadmap').innerHTML = html;
+    }
+
+    function initTopSection() {
+      const today = new Date();
+      const dayNumber = getDayNumber();
+      document.getElementById('todayDate').textContent =
+        today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('dayCounter').textContent = 'Day ' + dayNumber + ' of 30';
+      document.getElementById('greeting').textContent = 'Welcome back, Hafid — ready to build today\'s momentum?';
+      renderIncomeRoadmap(dayNumber);
+    }
+
+    focusEl.addEventListener('change', saveProfile);
+    levelEl.addEventListener('change', saveProfile);
+    apiKeyEl.addEventListener('input', saveApiKey);
+    generateBtn.addEventListener('click', generateTasks);
+
+    initTopSection();
+    loadProfile();
+    loadApiKey();
+
+    const tasks = loadTasksForToday();
+    renderTasks(tasks);
+    attachTaskEvents();
+  </script>
 </body>
 </html>
