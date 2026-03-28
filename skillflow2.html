@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillFlow AI</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0f0a1e; color: #f0f0f8; font-family: sans-serif; min-height: 100vh; padding: 20px; }
+h1 { text-align: center; font-size: 2rem; margin-bottom: 10px; background: linear-gradient(135deg, #7c3aed, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+p.sub { text-align: center; color: #9898b0; margin-bottom: 30px; }
+.btn { display: block; margin: 0 auto 20px; padding: 14px 40px; background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+#status { text-align: center; color: #9898b0; margin-bottom: 20px; min-height: 24px; }
+#error { text-align: center; color: #f87171; margin-bottom: 20px; min-height: 24px; }
+#cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1000px; margin: 0 auto; }
+.card { background: #1a1030; border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 18px; }
+.tags { display: flex; gap: 8px; margin-bottom: 10px; }
+.tag { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; background: rgba(124,58,237,0.2); color: #a78bfa; }
+.card h3 { font-size: 1rem; margin-bottom: 8px; color: #f0f0f8; }
+.card p { font-size: 0.88rem; color: #9898b0; margin-bottom: 10px; }
+.time { font-size: 0.8rem; color: #6b6b80; }
+</style>
+</head>
+<body>
+<h1>⚡ SkillFlow AI</h1>
+<p class="sub">Daily AI-generated tasks to build skills and earn online</p>
+<button class="btn" onclick="generateTasks()">⚡ Generate Tasks</button>
+<div id="status"></div>
+<div id="error"></div>
+<div id="cards"></div>
+<script>
+async function generateTasks() {
+  var btn = document.querySelector('.btn');
+  var status = document.getElementById('status');
+  var errDiv = document.getElementById('error');
+  var cards = document.getElementById('cards');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  status.textContent = 'Calling Gemini AI...';
+  errDiv.textContent = '';
+  cards.innerHTML = '';
+  var KEY = 'AIzaSyD-1rGs4q6SOoY2Lr0f-kaF1kLCXKcmfkk';
+  var prompt = 'Generate 6 practical daily tasks for someone learning AI automation and making money online. Return ONLY a JSON array. Each item must have title, description, category, difficulty, timeEstimate as string fields. No markdown, no code blocks, just raw JSON array.';
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + KEY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.error) throw new Error(data.error.message);
+    var text = data.candidates[0].content.parts[0].text;
+    var match = text.match(/\[([\s\S]*)\]/);
+    if (!match) throw new Error('Bad response: ' + text.slice(0, 150));
+    var tasks = JSON.parse('[' + match[1] + ']');
+    cards.innerHTML = tasks.slice(0, 6).map(function(t) {
+      return '<div class="card"><div class="tags"><span class="tag">' + (t.category||'AI') + '</span><span class="tag">' + (t.difficulty||'Medium') + '</span></div><h3>' + t.title + '</h3><p>' + t.description + '</p><div class="time">⏱ ' + t.timeEstimate + '</div></div>';
+    }).join('');
+    status.textContent = '✅ ' + tasks.length + ' tasks ready!';
+  })
+  .catch(function(err) {
+    errDiv.textContent = '❌ Error: ' + err.message;
+    status.textContent = '';
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = '⚡ Generate Tasks';
+  });
+}
+</script>
+</body>
+</html>
