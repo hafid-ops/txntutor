@@ -95,6 +95,7 @@
     }
 
     select,
+    input,
     .btn {
       width: 100%;
       border-radius: 10px;
@@ -298,6 +299,11 @@
           </select>
         </div>
         <div>
+          <label for="apiKey">Gemini API Key</label>
+          <input id="apiKey" type="password" placeholder="Paste your Gemini API key" />
+          <p id="apiHelp" class="sub" style="margin-top:6px;"></p>
+        </div>
+        <div>
           <label for="generateBtn">Generate Today’s Plan</label>
           <button id="generateBtn" class="btn">Generate 6 Action Tasks</button>
         </div>
@@ -331,12 +337,14 @@
   <script>
     const START_DATE_STR = '2026-03-28';
     const START_DATE = new Date(START_DATE_STR + 'T00:00:00');
-    const GEMINI_KEY = 'AIzaSyAyEE-ep1lsi0Xf0StRiXqSOCeKCen2y18';
-    const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + GEMINI_KEY;
+    const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=';
     const profileKey = 'skillflow_profile';
+    const apiKeyStorageKey = 'skillflow_api_key';
 
     const focusEl = document.getElementById('focus');
     const levelEl = document.getElementById('level');
+    const apiKeyEl = document.getElementById('apiKey');
+    const apiHelpEl = document.getElementById('apiHelp');
     const generateBtn = document.getElementById('generateBtn');
     const statusEl = document.getElementById('status');
     const errorEl = document.getElementById('error');
@@ -372,6 +380,25 @@
       } catch (e) {
         console.warn('Could not load profile', e);
       }
+    }
+
+    function saveApiKey() {
+      localStorage.setItem(apiKeyStorageKey, apiKeyEl.value.trim());
+      updateApiHelpText();
+    }
+
+    function loadApiKey() {
+      const savedKey = localStorage.getItem(apiKeyStorageKey) || '';
+      apiKeyEl.value = savedKey;
+      updateApiHelpText();
+    }
+
+    function updateApiHelpText() {
+      if (!apiKeyEl.value.trim()) {
+        apiHelpEl.textContent = 'Get your free key at aistudio.google.com/app/apikey';
+        return;
+      }
+      apiHelpEl.textContent = '';
     }
 
     function getTasksStorageKey(dateKey) {
@@ -484,6 +511,7 @@
 
     async function generateTasks() {
       const dayNumber = getDayNumber();
+      const apiKey = (localStorage.getItem(apiKeyStorageKey) || apiKeyEl.value || '').trim();
       const prompt = [
         'Create exactly 6 specific actionable tasks in valid JSON array format only.',
         'User skill focus: ' + focusEl.value + '.',
@@ -500,7 +528,11 @@
       errorEl.textContent = '';
 
       try {
-        const response = await fetch(GEMINI_URL, {
+        if (!apiKey) {
+          throw new Error('Gemini API key required. Add it in Skill Profile.');
+        }
+
+        const response = await fetch(GEMINI_BASE_URL + encodeURIComponent(apiKey), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -556,10 +588,12 @@
 
     focusEl.addEventListener('change', saveProfile);
     levelEl.addEventListener('change', saveProfile);
+    apiKeyEl.addEventListener('input', saveApiKey);
     generateBtn.addEventListener('click', generateTasks);
 
     initTopSection();
     loadProfile();
+    loadApiKey();
 
     const tasks = loadTasksForToday();
     renderTasks(tasks);
